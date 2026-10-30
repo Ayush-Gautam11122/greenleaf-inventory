@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block body %}<h1>Import products from CSV</h1><div class="card">
+<p>Required columns: <code>name, category, unit_price, stock_qty</code>. Optional: <code>reorder_level, expiry_date (YYYY-MM-DD), supplier</code>. Existing products (same name) are updated.</p>
+<p><a href="{{ url_for('products.template') }}">Download a template</a></p>
+<form method="post" enctype="multipart/form-data" class="row"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="file" name="file" accept=".csv" required><button class="btn">Upload</button></form>
+{% if errors %}<h2>Skipped rows</h2><ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+<a href="{{ url_for('products.index') }}">← Back to products</a></div>{% endblock %}

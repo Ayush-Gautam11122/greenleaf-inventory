@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block body %}<h1>Suppliers</h1><div class="card">
+<form method="post" class="row"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div><label>Name</label><input name="name" required></div><div><label>Phone</label><input name="phone"></div>
+<div><label>Email</label><input name="email" type="email"></div><button class="btn">Add supplier</button></form>
+<table><tr><th>Name</th><th>Phone</th><th>Email</th><th></th></tr>{% for s in suppliers %}<tr><td>{{ s.name }}</td><td>{{ s.phone or '—' }}</td><td>{{ s.email or '—' }}</td>
+<td><form method="post" action="{{ url_for('products.supplier_delete', sid=s.supplier_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn red sm">Remove</button></form></td></tr>{% endfor %}</table></div>{% endblock %}

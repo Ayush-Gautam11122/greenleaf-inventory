@@ -1,0 +1,33 @@
+erDiagram
+    USERS ||--o{ SALES : "rings up"
+    SUPPLIERS ||--o{ PRODUCTS : "supplies"
+    SALES ||--|{ SALE_ITEMS : "contains"
+    PRODUCTS ||--o{ SALE_ITEMS : "sold as"
+    USERS { int user_id PK
+            text username UK
+            text password_hash
+            text role "admin|cashier" }
+    SUPPLIERS { int supplier_id PK
+            text name UK
+            text phone
+            text email }
+    PRODUCTS { int product_id PK
+            text name UK
+            text category
+            real unit_price "CHECK >= 0"
+            int stock_qty "CHECK >= 0"
+            int reorder_level
+            text expiry_date
+            int supplier_id FK }
+    SALES { int sale_id PK
+            text sale_date
+            text sale_time
+            int user_id FK
+            real subtotal
+            real discount_pct "0-100"
+            real total_amount }
+    SALE_ITEMS { int sale_item_id PK
+            int sale_id FK
+            int product_id FK
+            int quantity "CHECK > 0"
+            real price "unit price at sale" }

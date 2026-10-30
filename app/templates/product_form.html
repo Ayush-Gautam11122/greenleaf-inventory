@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block body %}{% set p = product or {} %}
+<h1>{{ 'Edit' if p.product_id else 'Add' }} product</h1><div class="card"><form method="post" class="form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div><label>Name</label><input name="name" required value="{{ p.name or '' }}"></div>
+<div><label>Category</label><input name="category" required list="cats" value="{{ p.category or '' }}"><datalist id="cats">{% for c in categories %}<option>{{ c }}</option>{% endfor %}</datalist></div>
+<div><label>Unit price (₹)</label><input name="unit_price" type="number" step="0.01" min="0" required value="{{ p.unit_price if p.unit_price is not none else '' }}"></div>
+<div><label>Stock quantity</label><input name="stock_qty" type="number" min="0" required value="{{ p.stock_qty if p.stock_qty is not none else '' }}"></div>
+<div><label>Reorder level</label><input name="reorder_level" type="number" min="0" value="{{ p.reorder_level if p.reorder_level is not none else 10 }}"></div>
+<div><label>Expiry date (optional)</label><input name="expiry_date" type="date" value="{{ p.expiry_date or '' }}"></div>
+<div><label>Supplier</label><select name="supplier_id"><option value="">—</option>{% for s in suppliers %}<option value="{{ s.supplier_id }}" {{ 'selected' if p.supplier_id|string == s.supplier_id|string }}>{{ s.name }}</option>{% endfor %}</select></div>
+<div><button class="btn">Save</button> <a class="btn sec" href="{{ url_for('products.index') }}">Cancel</a></div></form></div>{% endblock %}

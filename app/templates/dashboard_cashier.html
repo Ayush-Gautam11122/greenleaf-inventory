@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block body %}<h1>Welcome, {{ session.username }}</h1>
+<div class="card"><a class="btn" href="{{ url_for('billing.new_bill') }}">➕ Create new bill</a></div>
+<div class="card"><h2>Your recent bills</h2>{% if recent %}<table><tr><th>Bill</th><th>Date</th><th>Time</th><th class="n">Total</th><th></th></tr>
+{% for s in recent %}<tr><td>#{{ s.sale_id }}</td><td>{{ s.sale_date }}</td><td>{{ s.sale_time }}</td><td class="n">{{ s.total_amount|money }}</td>
+<td><a href="{{ url_for('billing.receipt', sale_id=s.sale_id) }}">View</a></td></tr>{% endfor %}</table>{% else %}<p class="mu">No bills yet.</p>{% endif %}</div>{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% block title %}Reports{% endblock %}{% block body %}<h1>Reports</h1>
+{% set qs = 'start=' ~ start ~ '&end=' ~ end ~ '&metric=' ~ metric %}
+<div class="card"><form method="get" class="row"><div><label>From</label><input type="date" name="start" value="{{ start }}"></div>
+<div><label>To</label><input type="date" name="end" value="{{ end }}"></div><input type="hidden" name="metric" value="{{ metric }}"><button class="btn">Apply</button>
+<span style="flex:1"></span><div class="toggle"><a class="{{ 'on' if metric=='revenue' }}" href="?start={{ start }}&end={{ end }}&metric=revenue">Revenue</a><a class="{{ 'on' if metric=='quantity' }}" href="?start={{ start }}&end={{ end }}&metric=quantity">Quantity</a></div></form></div>
+<div class="grid g5" style="margin-bottom:18px">
+<div class="kpi"><div class="l">Total revenue</div><div class="v">{{ k.total_revenue|money }}</div></div>
+<div class="kpi"><div class="l">Avg bill value</div><div class="v">{{ k.avg_bill|money }}</div></div>
+<div class="kpi"><div class="l">Stock turnover</div><div class="v">{{ k.stock_turnover }}×</div></div>
+<div class="kpi"><div class="l">Low-stock items</div><div class="v">{{ k.low_stock_count }}</div></div>
+<div class="kpi"><div class="l">Top category share</div><div class="v">{{ k.top_category_share }}%</div><div class="mu">{{ k.top_category }}</div></div></div>
+<div class="grid g2"><div class="card"><h2>Daily</h2><img class="chart" src="{{ url_for('reports.chart', kind='daily') }}?{{ qs }}" alt="daily chart"></div>
+<div class="card"><h2>Monthly trend</h2><img class="chart" src="{{ url_for('reports.chart', kind='monthly') }}?{{ qs }}" alt="monthly chart"></div>
+<div class="card"><h2>Top 10 products</h2><img class="chart" src="{{ url_for('reports.chart', kind='top') }}?{{ qs }}" alt="top products"></div>
+<div class="card"><h2>Category share</h2><img class="chart" src="{{ url_for('reports.chart', kind='category') }}?{{ qs }}" alt="category share"></div></div>
+{% macro dl(n) %}<a class="btn sec sm" href="{{ url_for('reports.export', name=n) }}?start={{ start }}&end={{ end }}">⬇ CSV</a>{% endmacro %}
+<div class="card"><h2>Daily sales report {{ dl('daily') }}</h2><div style="max-height:260px;overflow:auto"><table><tr><th>Date</th><th class="n">Bills</th><th class="n">Units</th><th class="n">Revenue</th></tr>
+{% for r in daily|reverse %}<tr><td>{{ r.date }}</td><td class="n">{{ r.bills }}</td><td class="n">{{ r.quantity }}</td><td class="n">{{ r.revenue|money }}</td></tr>{% else %}<tr><td colspan="4" class="mu">No sales in range.</td></tr>{% endfor %}</table></div></div>
+<div class="card"><h2>Monthly sales report {{ dl('monthly') }}</h2><table><tr><th>Month</th><th class="n">Bills</th><th class="n">Units</th><th class="n">Revenue</th></tr>
+{% for r in monthly %}<tr><td>{{ r.month }}</td><td class="n">{{ r.bills }}</td><td class="n">{{ r.quantity }}</td><td class="n">{{ r.revenue|money }}</td></tr>{% endfor %}</table></div>
+<div class="grid g2"><div class="card"><h2>Top products {{ dl('top') }}</h2><table><tr><th>Product</th><th class="n">Units</th><th class="n">Revenue</th></tr>
+{% for r in top %}<tr><td>{{ r.name }}</td><td class="n">{{ r.quantity }}</td><td class="n">{{ r.revenue|money }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h2>Category share {{ dl('category') }}</h2><table><tr><th>Category</th><th class="n">Revenue</th><th class="n">Share</th></tr>
+{% for r in cats %}<tr><td>{{ r.category }}</td><td class="n">{{ r.revenue|money }}</td><td class="n">{{ r.share_pct }}%</td></tr>{% endfor %}</table></div>
+<div class="card"><h2>Low stock report {{ dl('low_stock') }}</h2><table><tr><th>Product</th><th class="n">Stock</th><th class="n">Reorder</th><th class="n">Suggest</th><th>Supplier</th></tr>
+{% for r in low %}<tr><td>{{ r.name }}</td><td class="n">{{ r.stock_qty }}</td><td class="n">{{ r.reorder_level }}</td><td class="n">{{ r.suggested_order }}</td><td>{{ r.supplier or '—' }}</td></tr>{% else %}<tr><td colspan="5" class="mu">None.</td></tr>{% endfor %}</table></div>
+<div class="card"><h2>Expiry report (≤15 days) {{ dl('expiry') }}</h2><table><tr><th>Product</th><th class="n">Stock</th><th>Expiry</th><th>Status</th></tr>
+{% for r in exp %}<tr><td>{{ r.name }}</td><td class="n">{{ r.stock_qty }}</td><td>{{ r.expiry_date }}</td><td><span class="tag {{ 'red' if r.days_left<0 else 'amb' }}">{{ r.status }}{% if r.days_left>=0 %} ({{ r.days_left }}d){% endif %}</span></td></tr>{% else %}<tr><td colspan="4" class="mu">None.</td></tr>{% endfor %}</table></div>
+<div class="card"><h2>Slow-moving (≤2 units in 30 days) {{ dl('slow_moving') }}</h2><table><tr><th>Product</th><th class="n">Stock</th><th class="n">Sold</th><th class="n">Stock value</th></tr>
+{% for r in slow %}<tr><td>{{ r.name }}</td><td class="n">{{ r.stock_qty }}</td><td class="n">{{ r.units_sold }}</td><td class="n">{{ r.stock_value|money }}</td></tr>{% else %}<tr><td colspan="4" class="mu">None.</td></tr>{% endfor %}</table></div>
+<div class="card"><h2>Next-7-day revenue forecast <small class="mu">(weekday average, last 8 weeks)</small></h2><table><tr><th>Date</th><th>Day</th><th class="n">Forecast</th></tr>
+{% for r in forecast %}<tr><td>{{ r.date }}</td><td>{{ r.weekday }}</td><td class="n">{{ r.forecast_revenue|money }}</td></tr>{% endfor %}</table></div></div>
+{% endblock %}

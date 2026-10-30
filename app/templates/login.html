@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block title %}Login – GreenLeaf{% endblock %}
+{% block body %}<div class="card login"><h1>🌿 GreenLeaf Grocers</h1><p class="mu">Sign in to continue</p>
+<form method="post" class="form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div><label>Username</label><input name="username" required autofocus></div>
+<div><label>Password</label><input name="password" type="password" required></div>
+<button class="btn">Log in</button></form></div>{% endblock %}

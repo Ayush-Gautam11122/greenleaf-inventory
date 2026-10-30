@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+{% if session.role == 'admin' %}
+<h1>Owner dashboard</h1>
+<p class="muted">Last 30 days ({{ start }} to {{ end }})</p>
+<div class="kpis">
+  <div class="kpi"><span>Total revenue</span><b>{{ kpi.total_revenue|money }}</b></div>
+  <div class="kpi"><span>Average bill</span><b>{{ kpi.avg_bill|money }}</b></div>
+  <div class="kpi"><span>Stock turnover</span><b>{{ kpi.stock_turnover }}</b></div>
+  <div class="kpi {{ 'warn' if kpi.low_stock_count }}"><span>Low-stock items</span><b>{{ kpi.low_stock_count }}</b></div>
+  <div class="kpi"><span>Top category</span><b>{{ kpi.top_category }} <small>{{ kpi.top_category_share }}%</small></b></div>
+</div>
+<div class="card"><img class="chart" alt="Revenue chart" src="data:image/png;base64,{{ chart }}"></div>
+<div class="grid2">
+  <div class="card"><h2>⚠️ Low stock</h2>
+    {% if low %}<table><tr><th>Product</th><th>Stock</th><th>Reorder at</th></tr>
+      {% for r in low %}<tr><td>{{ r.name }}</td><td>{{ r.stock_qty }}</td><td>{{ r.reorder_level }}</td></tr>{% endfor %}</table>
+    {% else %}<p class="muted">All products are well stocked.</p>{% endif %}
+    <a href="{{ url_for('main.reports_page') }}">Full report →</a></div>
+  <div class="card"><h2>⏳ Expiring within 15 days</h2>
+    {% if expiring %}<table><tr><th>Product</th><th>Expiry</th><th>Days</th></tr>
+      {% for r in expiring %}<tr><td>{{ r.name }}</td><td>{{ r.expiry_date }}</td><td>{{ r.days_left }}</td></tr>{% endfor %}</table>
+    {% else %}<p class="muted">Nothing is about to expire.</p>{% endif %}</div>
+</div>
+{% else %}
+<h1>Welcome, {{ session.username }}</h1>
+<div class="kpis">
+  <div class="kpi"><span>Your bills today</span><b>{{ today_bills }}</b></div>
+  <div class="kpi"><span>Your sales today</span><b>{{ today_total|money }}</b></div>
+</div>
+<a class="btn primary big" href="{{ url_for('main.billing') }}">+ New bill</a>
+{% endif %}
+{% endblock %}

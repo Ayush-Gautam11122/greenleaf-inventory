@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block title %}Products{% endblock %}{% block body %}<h1>Products</h1>
+<div class="card"><form class="row" method="get">
+<div><label>Search</label><input name="q" value="{{ q }}" placeholder="name or category"></div>
+<div><label>Category</label><select name="category"><option value="">All</option>{% for c in categories %}<option {{ 'selected' if c==cat }}>{{ c }}</option>{% endfor %}</select></div>
+<div><label>Status</label><select name="status"><option value="">All</option><option value="low" {{ 'selected' if status=='low' }}>Low stock</option><option value="out" {{ 'selected' if status=='out' }}>Out of stock</option><option value="expiring" {{ 'selected' if status=='expiring' }}>Expiring ≤15 days</option></select></div>
+<button class="btn">Filter</button><span style="flex:1"></span>
+<a class="btn" href="{{ url_for('products.new') }}">➕ Add product</a>
+<a class="btn sec" href="{{ url_for('products.import_csv') }}">Import CSV</a>
+<a class="btn sec" href="{{ url_for('products.export') }}">Export CSV</a></form>
+<table><tr><th>Name</th><th>Category</th><th class="n">Price</th><th class="n">Stock</th><th class="n">Reorder</th><th>Expiry</th><th>Supplier</th><th></th></tr>
+{% for p in products %}<tr><td>{{ p.name }}</td><td>{{ p.category }}</td><td class="n">{{ p.unit_price|money }}</td>
+<td class="n"><span class="tag {{ 'red' if p.stock_qty==0 else ('amb' if p.stock_qty<=p.reorder_level else 'ok') }}">{{ p.stock_qty }}</span></td>
+<td class="n">{{ p.reorder_level }}</td><td>{{ p.expiry_date or '—' }}</td><td>{{ p.supplier or '—' }}</td>
+<td style="white-space:nowrap"><a class="btn sec sm" href="{{ url_for('products.edit', pid=p.product_id) }}">Edit</a>
+<form method="post" action="{{ url_for('products.delete', pid=p.product_id) }}" style="display:inline" onsubmit="return confirm('Delete {{ p.name|e }}?')">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn red sm">Delete</button></form></td></tr>
+{% else %}<tr><td colspan="8" class="mu">No products match.</td></tr>{% endfor %}</table>
+<p class="mu">{{ products|length }} product(s)</p></div>{% endblock %}

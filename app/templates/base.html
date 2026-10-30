@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}GreenLeaf Grocers{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head><body>
+{% if session.user_id %}<nav><span class="brand">🌿 GreenLeaf Grocers</span>
+<a href="{{ url_for('auth.dashboard') }}">Dashboard</a>
+<a href="{{ url_for('billing.new_bill') }}">Billing</a>
+{% if session.role == 'admin' %}<a href="{{ url_for('products.index') }}">Products</a>
+<a href="{{ url_for('products.suppliers') }}">Suppliers</a><a href="{{ url_for('reports.index') }}">Reports</a>{% endif %}
+<span class="sp"></span><span>{{ session.username }} ({{ session.role }})</span>
+<form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec sm">Log out</button></form></nav>{% endif %}
+<main>{% for cat, msg in get_flashed_messages(with_categories=true) %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+{% block body %}{% endblock %}</main></body></html>

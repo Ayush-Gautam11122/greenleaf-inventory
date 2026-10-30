@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/claude/greenleaf
+plugins: platformdirs-4.13.0, anyio-4.15.1
+collected 29 items
+
+tests/test_app.py .............................                          [100%]
+
+============================= 29 passed in 10.96s ==============================
