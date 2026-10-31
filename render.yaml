@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: greenleaf-inventory
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python seed_data.py
+    startCommand: gunicorn run:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.12.3
